@@ -23,20 +23,21 @@ query_sensu_api = (msg, uri, callback) ->
   port = process.env.SENSU_API_PORT
   user = process.env.SENSU_API_USER
   pass = process.env.SENSU_API_PASSWORD
+
   auth = 'Basic ' + new Buffer(user + ':' + pass).toString('base64')
   msg.http("http://#{host}:#{port}/#{uri}")
-     .headers(Authorization: auth, Accept: 'application/json')
-     .get() (err, res, body) ->
-       data = JSON.parse(body)
-       switch res.statusCode
-         when 200
-           callback(data)
-         when 401
-           msg.send 'Incorrect API credentials!'
-         when 404
-           msg.send 'The resource you are looking for does not exist.'
-         else
-           msg.send 'Something went wrong, you should check on the Sensu API!'
+    .headers(Authorization: auth, Accept: 'application/json')
+    .get() (err, res, body) ->
+      switch res.statusCode
+        when 200
+          data = JSON.parse(body)
+          callback(data)
+        when 401
+          msg.send 'Incorrect API credentials!'
+        when 404
+          msg.send 'The resource you are looking for does not exist.'
+        else
+          msg.send 'Something went wrong, you should check on the Sensu API!'
 
 summarize_events = (events) ->
   flapping = 0
