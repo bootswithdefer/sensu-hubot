@@ -45,8 +45,8 @@ summarize_events = (events) ->
   critical = 0
   warning = 0
   for event in events
-    flapping += 1 if event.flapping
-    switch event.status
+    flapping += 1 if event.check.flapping
+    switch event.check.status
       when 2
         critical += 1
       when 1
@@ -57,14 +57,14 @@ summarize_events = (events) ->
   "unknown: #{unknown} - critical: #{critical} - warning: #{warning} - #{flapping} are flapping"
 
 event_severity = (event) ->
-  ['ok', 'warning', 'critical'][event.status] || 'unknown'
+  ['ok', 'warning', 'critical'][event.check.status] || 'unknown'
 
 format_event = (event) ->
   severity = event_severity(event)
-  output_lines = event.output.split("\n")
+  output_lines = event.check.output.split("\n")
   output = output_lines[0]
   output += ' ...' if output_lines.length > 1 and not not output_lines[1]
-  "#{severity} #{event.client}/#{event.check} #{output}"
+  "#{severity} #{event.client.name}/#{event.check.name} #{output}"
 
 formatted_event_list = (events) ->
   list = ''
